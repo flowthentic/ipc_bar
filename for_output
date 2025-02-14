@@ -1,0 +1,32 @@
+output * bg /usr/share/wallpapers/susetail.png fill
+
+output eDP-1 resolution 1920x1080 position 0 1080
+input 1003:35459:Atmel map_to_output eDP-1
+bar {
+    position top
+    font "Century Schoolbook L" Normal
+    status_command ~/.config/sway/bar2.bash eDP-1
+    output eDP-1
+    colors {
+        statusline #ffffff
+        background #287a6c89
+        active_workspace #287a6c89 #74924f33 #d4924fDD
+        inactive_workspace #287a6c89 #287a6c43 #964041DD
+        focused_workspace #FFFFFF44 #CB6A6A19 #288a7cFF
+    }
+}
+
+output HDMI-A-1 resolution 1920x1080 position 0 0
+bar {
+    position top
+    font "Century Schoolbook L" Normal
+    status_command ~/.config/sway/bar2.bash "HDMI-A-1"
+    output HDMI-A-1
+    colors {
+        statusline #ffffff
+        background #287a6c89
+        active_workspace #287a6c89 #74924f33 #d4924fDD
+        inactive_workspace #287a6c89 #287a6c43 #964041DD
+        focused_workspace #FFFFFF44 #CB6A6A19 #288a7cFF
+    }
+}

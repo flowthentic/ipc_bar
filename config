@@ -1,0 +1,116 @@
+set $mod Mod4
+set $term alacritty --config-file /etc/alacritty/alacritty.toml
+set $browser GTK_USE_PORTAL=1 firefox
+set $mailclient thunderbird
+set $lock swaylock -fkl -s center -i ~/.config/sway/padlock.png -c 373a1a
+set $menu wofi --conf=/etc/wofi/config --style=/etc/wofi/style.css
+
+gaps inner 3
+default_border pixel 2
+
+input "1:1:AT_Translated_Set_2_keyboard" {
+    xkb_layout us,sk
+    xkb_variant euro,qwerty
+    xkb_options grp:win_space_toggle
+}
+input "type:touchpad" {
+    tap enabled
+    natural_scroll enabled
+    middle_emulation enabled
+}
+bindsym $mod+t exec $$term
+bindsym Print exec grim -g "$(slurp)" - | wl-copy
+bindsym $mod+w kill
+bindsym $mod+l exec $lock
+bindsym $mod+d exec $menu
+
+# Drag floating windows by holding down $mod and left mouse button.
+# Resize them with right mouse button + $mod.
+# Despite the name, also works for non-floating windows.
+# Change normal to inverse to use left mouse button for resizing and right
+# mouse button for dragging.
+floating_modifier $mod normal
+
+# Reload the configuration file
+bindsym $mod+F5 reload
+
+# Move your focus around
+bindsym $mod+Left focus left
+bindsym $mod+Down focus down
+bindsym $mod+Up focus up
+bindsym $mod+Right focus right
+# Move focus to the parent container
+bindsym $mod+Escape focus parent
+# Move the focused workspace with the same, but add Shift
+bindsym $mod+Shift+Left move workspace to output left
+bindsym $mod+Shift+Down move workspace to output down
+bindsym $mod+Shift+Up move workspace to output up
+bindsym $mod+Shift+Right move workspace to output right
+
+# Switch to workspace
+bindsym Shift+F1 workspace number 1
+bindsym Shift+F2 workspace number 2
+bindsym Shift+F3 workspace number 3
+bindsym Shift+F4 workspace number 4
+bindsym Shift+F5 workspace number 5
+bindsym Shift+F6 workspace number 6
+bindsym Shift+F7 workspace number 7
+bindsym Shift+F8 workspace number 8
+bindsym Shift+F9 workspace number 9
+bindsym Shift+F10 workspace number 10
+# Move focused container to workspace
+bindsym $mod+Shift+F1 move container to workspace number 1
+bindsym $mod+Shift+F2 move container to workspace number 2
+bindsym $mod+Shift+F3 move container to workspace number 3
+bindsym $mod+Shift+F4 move container to workspace number 4
+bindsym $mod+Shift+F5 move container to workspace number 5
+bindsym $mod+Shift+F6 move container to workspace number 6
+bindsym $mod+Shift+F7 move container to workspace number 7
+bindsym $mod+Shift+F8 move container to workspace number 8
+bindsym $mod+Shift+F9 move container to workspace number 9
+bindsym $mod+Shift+F10 move container to workspace number 10
+# Note: workspaces can have any name you want, not just numbers.
+
+# Layout stuff:
+bindsym $mod+h splith
+bindsym $mod+j splitv
+# Switch the current container between different layout styles
+bindsym $mod+u layout stacking
+bindsym $mod+b layout tabbed
+bindsym $mod+y layout toggle split
+# Make the current focus fullscreen
+bindsym $mod+F11 fullscreen
+# Toggle the current focus between tiling and floating mode
+bindsym $mod+Shift+F12 floating toggle
+# Swap focus between the tiling area and the floating area
+bindsym Shift+F12 focus mode_toggle
+
+exec swayidle -w \
+    timeout 300 'swaymsg "output * dpms off"' resume 'swaymsg "output * dpms on"' \
+    timeout 600 '$lock' \
+    before-sleep '$lock'
+
+bindsym $mod+s move scratchpad
+bindsym $mod+a scratchpad show
+mode "scratchpad" {
+    bindsym $mod+a exec "sh -c 'swaymsg scratchpad show; swaymsg scratchpad show'"
+    bindsym Escape mode "default"
+    bindsym $mod+s exec "sh -c 'swaymsg move scratchpad; swaymsg mode \"default\"'
+    bindsym $mod+w kill
+    bindsym $mod+Shift+F12 floating toggle
+}
+
+mode "resize" {
+    bindsym Left resize shrink width 10px
+    bindsym Down resize grow height 10px
+    bindsym Up resize shrink height 10px
+    bindsym Right resize grow width 10px
+    # Return to default mode
+    bindsym Return mode "default"
+    bindsym Escape mode "default"
+}
+bindsym $mod+r mode "resize"
+
+include for_output
+include /etc/sway/config.d/51-openSUSE.conf
+include for_window

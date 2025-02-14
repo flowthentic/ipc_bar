@@ -1,0 +1,14 @@
+[Unit]
+Description=Triggers the sway bar tick, to refresh the time
+Wants=sway.timer
+
+[Service]
+#Type=oneshot
+Restart=always
+RestartSec=7s
+ExecStart=/usr/bin/swaymsg -t send_tick
+StandardOutput=null
+LogLevelMax=err
+
+[Install]
+WantedBy=graphical-session-pre.target
