@@ -2,6 +2,6 @@ for_window [app_id="firefox" title="Picture-in-Picture"] floating enable, resize
 for_window [class=".*"] inhibit_idle fullscreen
 for_window [app_id=".*"] inhibit_idle fullscreen
 for_window [app_id="rustdesk"] inhibit_idle visible
-for_window [app_id="org.gnupg.pinentry-qt"] input "$kbID" xkb_switch_layout 0
-for_window [app_id="firefox"] input "1:1:AT_Translated_Set_2_keyboard" xkb_switch_layout next > /dev/zero
-
+#for_window [app_id="org.gnupg.pinentry-qt"] input "$kbID" xkb_switch_layout 0
+no_focus [class="jetbrains-phpstorm" title="Tip of the Day"]
+for_window [class="jetbrains-phpstorm" title="\w+: .+"] fullscreen enabled

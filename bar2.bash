@@ -1,8 +1,12 @@
 #!/bin/bash
-# $1 argument may hold the output screen ID
+# $1 argument may hold the output screen ID (see config file for more info)
 declare -r kbID="1:1:AT_Translated_Set_2_keyboard"
-declare -r separator='"separator_block_width": 20'
 declare -r power="upower -i /org/freedesktop/UPower/devices/battery_BAT0"
+declare -r tempProbe="/sys/devices/virtual/thermal/thermal_zone7/temp"
+# the following command may help you choosing the right one
+# find /sys/devices/virtual/thermal -name temp -print -exec cat "{}" \;
+
+declare -r separator='"separator_block_width": 20'
 declare -A inputBindings
 appTitle='""'
 echo '{"version": 1, "click_events": true}'
@@ -41,10 +45,9 @@ swaymsg -t subscribe -m '["window","tick","input","workspace"]' | while read -r 
         focus)
             swaymsg mode $(echo "$event" | jq '.container | if select(.visible).scratchpad_state=="fresh" then "scratchpad" else "default" end') > /dev/zero
             appID=$(echo "$event" | jq -r '.container | .app_id // .window_properties?.instance')
-            echo "$event" | jq '.container' >> /tmp/swaylog.js
             ;&
         title)
-            appTitle=$(echo "$event" | jq ".container | select(.focused).name // $appTitle" | tr -s '–|—' '-' | tr -dc '[:print:]')
+            appTitle=$(echo "$event" | jq ".container | select(.focused).name // $appTitle" | awk '{gsub(/[—–|—]/, "-"); print}')
             case "${wsNum:+$appID}" in
                 "")
                     appTitle='""' shortTitle= # no title on inactive workspace
@@ -62,7 +65,8 @@ swaymsg -t subscribe -m '["window","tick","input","workspace"]' | while read -r 
                     if [[ -v inputBindings[$appID] ]]; then  #set keyboard layout if stored for current pid
                         swaymsg input "$kbID" xkb_switch_layout "${inputBindings[$appID]}" > /dev/zero
                     fi
-                    shortTitle=$(echo "$appTitle" | tr -d '\\"' | awk -F "-" '{print $NF}')
+                    shortTitle=$(echo "$appTitle" | awk -F "-" '{gsub(/"/, ""); print $NF}')
+#                    echo "$event" | jq '.container' >> /tmp/swaylog.js
                     ;;
             esac
             ;;
@@ -78,8 +82,8 @@ swaymsg -t subscribe -m '["window","tick","input","workspace"]' | while read -r 
     esac
     
     mem=$(free --mega | awk 'NR==2 && $7<1000 {print $7}')
-    temp=$(awk -v tempt=${tempt:=70} '$1>tempt*1000 {print int($1/1000)}' /sys/devices/virtual/thermal/thermal_zone7/temp)
-    tempt=${temp:+50} #find /sys/devices/virtual/thermal -name temp -print -exec cat "{}" \;
+    temp=$(awk -v tempt=${tempt:=70} '$1>tempt*1000 {print int($1/1000)}' $tempProbe)
+    tempt=${temp:+50}
     net=$(nmcli -t connection | awk -F':' '$4 {print $3}' | sed 's/vpn//; s/802-11-wireless//; t; d' | xargs)
     bat=$($power | awk '/percentage/ { $r=substr($2,1,length($2)-1); if(int($r)<80) print $r; }')
     if [ -z "$bat" ] || [ "$bat" -ge 40 ] || (( $($power | awk '/state/ {print $2=="charging"}') )); then

@@ -1,7 +1,6 @@
 set $mod Mod4
 set $term alacritty --config-file /etc/alacritty/alacritty.toml
 set $browser GTK_USE_PORTAL=1 firefox
-set $mailclient thunderbird
 set $lock swaylock -fkl -s center -i ~/.config/sway/padlock.png -c 373a1a
 set $menu wofi --conf=/etc/wofi/config --style=/etc/wofi/style.css
 
