@@ -1,6 +1,7 @@
-# IPC swaybar bash renderer
+# IPC bar content generator
 
-This is an ipc compatible script for rendering essential info in the swaybar
+bar2.bash is an ipc compatible script for rendering essential info in the swaybar.
+Everything else is the rest of the configuration to make it usable and my personal preferences in key bindings.
 
 ![screenshot](demo.png)
 
@@ -8,6 +9,7 @@ This is an ipc compatible script for rendering essential info in the swaybar
 * Keyboard input language
 * Battery (if under 80%)
 * CPU temperature
+* remaining RAM (if under 1 GB)
 * Date and time
 
 ## Setup

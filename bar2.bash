@@ -30,20 +30,20 @@ swaymsg -t subscribe -m '["window","tick","input","workspace"]' | while read -r 
         workspaceempty)
             ;; # dont do anything if deleting empty non-focused workspace
         workspace*)
-            wsNum=$(echo "$event" | jq -r --arg outID $1 '.current | select(.output==$outID).num')
+            wsNum=$(echo "$event" | jq -r --arg outID "$1" '.current | select(.output==$outID).num')
             ;&
         close | move)
 	    echo "$wsNum" >> /tmp/wsnum.log
             currentWs=$(swaymsg -t get_tree | jq --argjson ws "${wsNum:=0.1}" '.nodes.[].nodes.[] | select(.num==$ws)')
-            if [ -n "$currentWs" ] && [ $(echo "$currentWs" | jq '.floating_nodes | length') -eq 0 ]; then
+            if [ -n "$currentWs" ] && [ "$(echo "$currentWs" | jq '.floating_nodes | length')" -eq 0 ]; then
                 swaymsg mode "default" > /dev/zero # there is definitely no window from scratchpad
-                if [ $(echo "$currentWs" | jq '.nodes | length') -eq 0 ]; then
+                if [ "$(echo "$currentWs" | jq '.nodes | length')" -eq 0 ]; then
                     appTitle='""' shortTitle= # delete title on empty workspace, container event won't get fired
                 fi
             fi
             ;;
         focus)
-            swaymsg mode $(echo "$event" | jq '.container | if select(.visible).scratchpad_state=="fresh" then "scratchpad" else "default" end') > /dev/zero
+            swaymsg mode "$(echo "$event" | jq '.container | if select(.visible).scratchpad_state=="fresh" then "scratchpad" else "default" end')" > /dev/zero
             appID=$(echo "$event" | jq -r '.container | .app_id // .window_properties?.instance')
             ;&
         title)
@@ -75,20 +75,20 @@ swaymsg -t subscribe -m '["window","tick","input","workspace"]' | while read -r 
             event=$(swaymsg -rt get_inputs | jq --arg id "$kbID" '{"input": (.[] | select(.identifier==$id))}')
             wsNum=0 appID=0
             ;&
-        $kbID)
+        "$kbID")
             inputBindings[$appID]=$(echo "$event" | jq -r '.input.xkb_active_layout_index')
             input=$(echo "$event" | jq -r '.input.xkb_active_layout_name[0:2]')
             ;;
     esac
     
     mem=$(free --mega | awk 'NR==2 && $7<1000 {print $7}')
-    temp=$(awk -v tempt=${tempt:=70} '$1>tempt*1000 {print int($1/1000)}' $tempProbe)
+    temp=$(awk -v tempt="${tempt:=70}" '$1>tempt*1000 {print int($1/1000)}' $tempProbe)
     tempt=${temp:+50}
     net=$(nmcli -t connection | awk -F':' '$4 {print $3}' | sed 's/vpn//; s/802-11-wireless//; t; d' | xargs)
     bat=$($power | awk '/percentage/ { $r=substr($2,1,length($2)-1); if(int($r)<80) print $r; }')
     if [ -z "$bat" ] || [ "$bat" -ge 40 ] || (( $($power | awk '/state/ {print $2=="charging"}') )); then
 	bat_lvl="#FFFFFF";
-    elif [ $bat -ge 20 ] && (( $($power | awk '/state/ {print $2!="charging"}') )); then
+    elif [ "$bat" -ge 20 ] && (( $($power | awk '/state/ {print $2!="charging"}') )); then
         bat_lvl="#FF0000"
     else 
         echo "Would like to hibernate at $(date +'%H:%M')" >> /tmp/swaylog.js
@@ -118,9 +118,9 @@ swaymsg -t subscribe -m '["window","tick","input","workspace"]' | while read -r 
     "name": "time", $separator,
     "full_text": "$(date +'%A %H:%M %B %d')",
 },{
-      "name": "net", $separator,
-      "full_text": "$net",
-  }],
+    "name": "net", $separator,
+    "full_text": "$net",
+}],
 EOUpdate
 #https://fontawesome.com/v4/cheatsheet/
 done
